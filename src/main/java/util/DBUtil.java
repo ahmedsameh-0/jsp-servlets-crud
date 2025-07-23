@@ -1,7 +1,9 @@
 package util;
 
+import jakarta.servlet.ServletException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.SQLException;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import javax.sql.DataSource;
@@ -15,33 +17,33 @@ public class DBUtil {
 
     private static DataSource getDataSource() throws NamingException {
         if (dataSource == null) {
-            InitialContext ctx = new InitialContext();
-            dataSource = (DataSource) ctx.lookup(JDBC);
+            try {
+                InitialContext ctx = new InitialContext();
+                dataSource = (DataSource) ctx.lookup(JDBC);
+            } catch (NamingException e) {
+                throw e;
+            }
         }
         return dataSource;
     }
 
-    public static boolean executeUpdate(String sql, Object... params) {
-
+    public static boolean executeUpdate(String sql, Object... params) throws ServletException, NamingException {
         try (Connection conn = getDataSource().getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
             for (int i = 0; i < params.length; i++) {
                 stmt.setObject(i + 1, params[i]);
             }
-
             stmt.executeUpdate();
             return true;
-        } catch (Exception ex) {
-            ex.printStackTrace();
-            return false;
+        }  catch (SQLException ex) {
+            throw new ServletException(ex);
         }
     }
 
-    public static Connection connect() {
+    public static Connection connect() throws ServletException, NamingException {
         try {
             return getDataSource().getConnection();
-        } catch (Exception ex) {
-            ex.printStackTrace();
-            return null;
+        } catch (SQLException ex) {
+            throw new ServletException(ex);
         }
     }
 }

@@ -1,11 +1,10 @@
-<jsp:include page="../includes/header.jsp"/>
+<%@page import="entity.User"%>
 <%
-    String username = (String) session.getAttribute("username");
-//    if (username == null) {
-////        response.sendRedirect("login.jsp");
-//        return;
-//    }
+ request.setAttribute("pageTitle", "Welcome");
+ User user = (User) session.getAttribute("username");
 %>
-<p class="fw-bold">Welcome {$username} 👋</p>
-
-<jsp:include page="../includes/footer.jsp"/>
+<jsp:include page="shared/header.jsp"/>
+<div class="container">
+    <h2 class="fw-bold">Welcome, <%= user != null ? user.getFullName() : "Guest" %> 👋</h2>
+    </div>
+    <jsp:include page="shared/footer.jsp"/>

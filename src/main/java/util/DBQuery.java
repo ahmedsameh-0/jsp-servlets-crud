@@ -7,7 +7,17 @@ public class DBQuery {
     private static final String updateQuery = "UPDATE users SET fullName = ?, phoneNumber = ?, addess = ?, email = ?, password = ? WHERE id = ?";
     private static final String insertQuery = "INSERT INTO users (fullName, phoneNumber, address, email, password) VALUES (?,?,?,?,?)";
     private static final String deleteQuery = "DELETE FROM users WHERE id = ?";
+    private static final String loginQuery = "SELECT * FROM users WHERE email = ? AND password = ?";
+    private static final String registerQuery = "INSERT INTO users (name, email, password) VALUES (?, ?, ?)";
+
+    public static String getRegisterQuery() {
+        return registerQuery;
+    }
     
+    public static String getLoginQuery() {
+        return loginQuery;
+    }
+
     public static String getSelectQuery() {
         return selectQuery;
     }
@@ -27,5 +37,4 @@ public class DBQuery {
     public static String getDeleteQuery() {
         return deleteQuery;
     }
-
 }
