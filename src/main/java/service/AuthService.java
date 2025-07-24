@@ -1,7 +1,7 @@
 package service;
 
-import entity.User;
-import entity.dto.LoginDto;
+import model.User;
+import dto.LoginDto;
 import jakarta.servlet.ServletException;
 import util.DBUtil;
 import java.sql.*;
@@ -30,7 +30,7 @@ public class AuthService {
             if (rs.next()) {
                 User user = new User();
                 user.setId(rs.getInt("id"));
-                user.setFullName(rs.getString("full_name"));
+                user.setFullName(rs.getString("fullName"));
                 user.setEmail(rs.getString("email"));
 
                 return user;

@@ -1,10 +1,10 @@
 <% 
  request.setAttribute("pageTitle", "Register");
 %>
-
+<%@page session="true"%>
 <jsp:include page="../shared/header.jsp"/>
 
-  <form action="AuthController" method="post">
+  <form action="${pageContext.request.contextPath}/AuthController" method="post">
       <input type="hidden" name="action" value="register">
             <div class="card-body">
                 <div class="mb-3">

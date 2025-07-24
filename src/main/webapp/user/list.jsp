@@ -1,7 +1,7 @@
+<%@page session="true"%>
 <%
     request.setAttribute("pageTitle", "List Users");
 %>
-
 <jsp:include page="../shared/header.jsp"/>
 
     <div class="card shadow">
@@ -32,18 +32,21 @@
     $(document).ready(function () {
         $('#userTable').DataTable({
             "ajax": {
-                "url": "${pageContext.request.contextPath}/UserController?action=list",
-                "dataSrc": "data"
+                url: '${pageContext.request.contextPath}/UserController?action=list-json',
+                "dataSrc": function(json) {
+                    console.log("DataTables received JSON:", json);
+                        return json.data || [];
+                }
             },
             "columns": [
                 { "data": "id" },
-                { "data": "name" },
+                { "data": "fullName" },
                 { "data": "phoneNo" },
                 { "data": "address" },
                 { "data": "email" },
-                { "data": "password" }
+                { "data": "password" } 
             ]
         });
     });
-    
+
 </script>

@@ -1,4 +1,4 @@
-package entity.dto;
+package dto;
 
 public class LoginDto {
 

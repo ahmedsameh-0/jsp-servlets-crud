@@ -1,6 +1,6 @@
 package service;
 
-import entity.User;
+import model.User;
 import jakarta.servlet.ServletException;
 import util.DBUtil;
 import java.sql.Connection;

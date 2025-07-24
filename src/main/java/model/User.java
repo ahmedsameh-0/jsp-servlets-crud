@@ -1,4 +1,4 @@
-package entity;
+package model;
 
 public class User {
 
@@ -9,7 +9,7 @@ public class User {
     private String email;
     private String password;
 
-    public User(int id, String fullName, int phoneNo, String email,  String password, String address) {
+    public User(int id, String fullName, int phoneNo, String address, String email, String password) {
         this.id = id;
         this.fullName = fullName;
         this.phoneNo = phoneNo;
@@ -18,7 +18,7 @@ public class User {
         this.address = address;
     }
 
-    public User(String fullName, int phoneNo, String email, String password, String address) {
+    public User(String fullName, int phoneNo, String address, String email, String password) {
         this.fullName = fullName;
         this.phoneNo = phoneNo;
         this.email = email;
@@ -68,8 +68,7 @@ public class User {
     public void setAddress(String address) {
         this.address = address;
     }
-    
-    
+
     public String getPassword() {
         return password;
     }

@@ -1,13 +1,14 @@
 <% 
  request.setAttribute("pageTitle", "Add user");
 %>
+<%@page session="true"%>
 <jsp:include page="../shared/header.jsp"/>
 <div class="container mt-5">
     <div class="card shadow">
         <div class="card-header bg-success text-white">
             <h4 class="mb-0">Add New User</h4>
         </div>
-        <form action="UserController" method="post">
+        <form action="${pageContext.request.contextPath}/UserController" method="post">
             <input type="hidden" name="action" value="create-user">
             <div class="card-body">
                 <div class="mb-3">
@@ -32,8 +33,8 @@
                 </div>
             </div>
             <div class="card-footer text-end">
-                <a href="${pageContext.request.contextPath}/index.jsp" class="btn btn-secondary">Cancel</a>
                 <button type="submit" class="btn btn-success">Add</button>
+                <a href="${pageContext.request.contextPath}/index.jsp" class="btn btn-secondary">Cancel</a>
             </div>
         </form>
    </div>

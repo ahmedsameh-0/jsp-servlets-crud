@@ -1,6 +1,6 @@
 package controller;
 
-import entity.User;
+import model.User;
 import service.UserService;
 import jakarta.servlet.RequestDispatcher;
 import jakarta.servlet.ServletException;
@@ -11,7 +11,9 @@ import java.io.IOException;
 import com.google.gson.Gson;
 import jakarta.servlet.annotation.WebServlet;
 import java.sql.SQLException;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import javax.naming.NamingException;
 
 @WebServlet("/UserController")
@@ -32,8 +34,10 @@ public class UserController extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+
+        String action = request.getParameter("action");
+
         try {
-            String action = request.getParameter("action");
 
             switch (action) {
                 case "create-user":
@@ -45,14 +49,9 @@ public class UserController extends HttpServlet {
                 case "delete-user":
                     deleteUser(request, response);
                     break;
-                default:
-                    listUserJson(response);
-                    break;
             }
         } catch (SQLException ex) {
             throw new ServletException(ex);
-        } catch (NamingException ex) {
-           throw new ServletException(ex);
         }
     }
 
@@ -65,19 +64,19 @@ public class UserController extends HttpServlet {
         try {
             switch (action) {
                 case "list":
-                    listUserPage(request, response);
+                    listPage(request, response);
                     break;
                 case "list-json":
-                    listUserJson(response);
+                    listJson(request, response);
                     break;
                 default:
-                    listUserPage(request,response);
+                    listPage(request, response);
                     break;
             }
         } catch (SQLException ex) {
             throw new ServletException(ex);
         } catch (NamingException ex) {
-           throw new ServletException(ex);
+            throw new ServletException(ex);
         }
     }
 
@@ -91,7 +90,8 @@ public class UserController extends HttpServlet {
         String password = request.getParameter("password");
         User user = new User(name, phoneNo, address, email, password);
         userService.insertUser(user);
-        response.sendRedirect("/user/list.jsp");
+        response.sendRedirect(request.getContextPath() + "/user/list.jsp");
+
     }
 
     private void updateUser(HttpServletRequest request, HttpServletResponse response)
@@ -106,7 +106,7 @@ public class UserController extends HttpServlet {
 
         User updatedUser = new User(id, name, phoneNo, address, email, password);
         userService.updateUser(updatedUser);
-        response.sendRedirect("/user/list.jsp");
+        response.sendRedirect(request.getContextPath() + "/user/list.jsp");
     }
 
     private void deleteUser(HttpServletRequest request, HttpServletResponse response)
@@ -114,41 +114,52 @@ public class UserController extends HttpServlet {
 
         int id = Integer.parseInt(request.getParameter("id"));
         userService.deleteUser(id);
-        response.sendRedirect("/user/list.jsp");
+        response.sendRedirect(request.getContextPath() + "/user/list.jsp");
     }
 
-    private void listUserJson(HttpServletResponse response)
+    private void listJson(HttpServletRequest request, HttpServletResponse response)
             throws IOException, SQLException, NamingException, ServletException {
 
+        // Check is user authentected for return the json data or no 
+        Object isAuth = request.getSession().getAttribute("user");
+
+        if (isAuth == null) {
+            response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+            return;
+        }
+
         try {
-            
             List<User> listUser = userService.getAllUsers();
-            String json = new Gson().toJson(new Object() {
-                final List<User> data = listUser;
-            });
+
+            Map<String, Object> jsonResponse = new HashMap<>();
+            jsonResponse.put("data", listUser);
+
+            String json = new Gson().toJson(jsonResponse);
+            System.out.println(json);
 
             response.setContentType("application/json");
             response.setCharacterEncoding("UTF-8");
             response.getWriter().write(json);
-            
-        } catch (ServletException ex) {
-            System.getLogger(UserController.class.getName()).log(System.Logger.Level.ERROR, (String) null, ex);
-        } catch (NamingException ex) {
-           throw new ServletException(ex);
+
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            response.setContentType("application/json");
+            response.setCharacterEncoding("UTF-8");
+            response.getWriter().write("{\"error\":\"" + ex.getMessage() + "\"}");
         }
     }
 
-    private void listUserPage(HttpServletRequest request, HttpServletResponse response)
+    private void listPage(HttpServletRequest request, HttpServletResponse response)
             throws SQLException, ServletException, IOException, NamingException {
 
         try {
             List<User> listUser = userService.getAllUsers();
             request.setAttribute("listUser", listUser);
-            
-            RequestDispatcher dispatcher = request.getRequestDispatcher("/user/list.jsp");
+
+            RequestDispatcher dispatcher = request.getRequestDispatcher(request.getContextPath() + "/user/list.jsp");
             dispatcher.forward(request, response);
         } catch (NamingException ex) {
-           throw new ServletException(ex);
+            throw new ServletException(ex);
         }
     }
 }

@@ -1,7 +1,7 @@
 package controller;
 
-import entity.User;
-import entity.dto.LoginDto;
+import model.User;
+import dto.LoginDto;
 import jakarta.servlet.RequestDispatcher;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -27,12 +27,12 @@ public class AuthController extends HttpServlet {
     protected void doPost(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
         try {
             String action = req.getParameter("action");
-            
+
             switch (action) {
-                case "/login":
+                case "login":
                     login(req, res);
                     break;
-                case "/register":
+                case "register":
                     register(req, res);
                     break;
             }
@@ -49,7 +49,7 @@ public class AuthController extends HttpServlet {
             case "/":
                 welcome(req, res);
                 break;
-            case "/logout":
+            case "logout":
                 logout(req, res);
                 break;
         }
@@ -60,13 +60,13 @@ public class AuthController extends HttpServlet {
         String password = request.getParameter("password");
 
         LoginDto dto = new LoginDto(username, password);
-        
+
         User user = authService.login(dto);
 
         if (user != null) {
             HttpSession session = request.getSession();
-            session.setAttribute("username", user.getFullName());
-            response.sendRedirect("/index.jsp");
+            session.setAttribute("user", user);
+            response.sendRedirect(request.getContextPath() + "/index.jsp");
         } else {
             request.setAttribute("error", "Invalid username or password");
             RequestDispatcher dispatcher = request.getRequestDispatcher("/auth/login.jsp");
@@ -78,7 +78,7 @@ public class AuthController extends HttpServlet {
     }
 
     private static void welcome(HttpServletRequest req, HttpServletResponse res) throws IOException, ServletException {
-        if (req.getSession().getAttribute("username") == null) {
+        if (req.getSession().getAttribute("user") == null) {
             res.sendRedirect("/auth/login.jsp");
             return;
         }
@@ -87,7 +87,16 @@ public class AuthController extends HttpServlet {
     }
 
     private void logout(HttpServletRequest req, HttpServletResponse res) throws IOException {
-        req.getSession().invalidate();
-        res.sendRedirect("/auth/login.jsp");
+        
+        HttpSession session = req.getSession(false);
+        if (session != null) {
+            session.invalidate();
+        }
+
+        //  Redirect and Remove Cache
+        res.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
+        res.setHeader("Pragma", "no-cache");
+        res.setDateHeader("Expires", 0);
+        res.sendRedirect(req.getContextPath() + "/auth/login.jsp");
     }
 }
